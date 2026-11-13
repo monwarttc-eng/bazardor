@@ -1,6 +1,5 @@
 "use client";
 import { authClient } from "@/lib/auth-client";
-import { Check } from "@gravity-ui/icons";
 import {
   Button,
   Description,
@@ -13,143 +12,168 @@ import {
 } from "@heroui/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const onSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
-    const { data: resData, error } = await authClient.signUp.email({
+    const data = Object.fromEntries(new FormData(e.currentTarget).entries());
+
+    const { error } = await authClient.signUp.email({
       name: data.name,
       email: data.email,
       password: data.password,
     });
-    toast("Sign in successful");
+
+    setLoading(false);
+
+    if (error) {
+      toast.danger(error.message || "অ্যাকাউন্ট তৈরি করা যায়নি");
+      return;
+    }
+
+    toast.success("অ্যাকাউন্ট তৈরি হয়েছে");
     router.push("/sign-in");
-    console.log(resData, error);
   };
 
+  const socialSignIn = (provider) =>
+    authClient.signIn.social({ provider, callbackURL: "/" });
+
+  const inputClass = "h-11 rounded-lg";
+  const labelClass = "font-medium text-gray-800";
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 px-4 py-10">
-      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 shadow-xl">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200">
-            <Check className="h-7 w-7" />
-          </div>
+    <div className="flex min-h-screen flex-col items-center bg-[#f1f5f0] px-4 py-10">
+      {/* Header */}
+      <div className="mb-8 text-center">
+        <h1 className="text-3xl font-bold text-gray-900">
+          অ্যাকাউন্ট তৈরি করুন
+        </h1>
+        <p className="mt-2 text-sm text-gray-600">
+          বিনা খরচে সাইন আপ করে সব বিস্তারিত দাম দেখুন।
+        </p>
+      </div>
 
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Create Account
-          </h1>
-
-          <p className="mt-2 text-sm text-gray-500">
-            Sign up to get started with your account.
-          </p>
-        </div>
-
-        {/* Form */}
+      {/* Card */}
+      <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white/70 p-6 sm:p-7">
         <Form className="flex flex-col gap-5" onSubmit={onSubmit}>
-          {/* Full Name */}
           <TextField isRequired name="name" type="text">
-            <Label className="font-medium text-gray-700">Full Name</Label>
+            <Label className={labelClass}>নাম</Label>
             <Input
-              placeholder="John Doe"
-              className="h-11 rounded-lg"
+              placeholder="যেমন: রহিম উদ্দিন"
+              className={inputClass}
               autoComplete="name"
             />
             <FieldError />
           </TextField>
 
-          {/* Email */}
           <TextField
             isRequired
             name="email"
             type="email"
-            validate={(value) => {
-              if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-                return "Please enter a valid email address";
-              }
-              return null;
-            }}
+            validate={(v) =>
+              /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(v)
+                ? null
+                : "সঠিক ইমেইল ঠিকানা দিন"
+            }
           >
-            <Label className="font-medium text-gray-700">Email Address</Label>
+            <Label className={labelClass}>ইমেইল</Label>
             <Input
-              placeholder="john@example.com"
-              className="h-11 rounded-lg"
+              placeholder="you@example.com"
+              className={inputClass}
               autoComplete="email"
             />
             <FieldError />
           </TextField>
 
-          {/* Password */}
           <TextField
             isRequired
-            minLength={8}
             name="password"
             type="password"
-            validate={(value) => {
-              if (value.length < 8) {
-                return "Password must be at least 8 characters";
-              }
-
-              if (!/[A-Z]/.test(value)) {
-                return "Include at least one uppercase letter";
-              }
-
-              if (!/[0-9]/.test(value)) {
-                return "Include at least one number";
-              }
-
+            value={password}
+            onChange={setPassword}
+            validate={(v) => {
+              if (v.length < 8) return "কমপক্ষে ৮ অক্ষর দিন";
+              if (!/[A-Z]/.test(v)) return "অন্তত একটি বড় হাতের অক্ষর দিন";
+              if (!/[0-9]/.test(v)) return "অন্তত একটি সংখ্যা দিন";
               return null;
             }}
           >
-            <Label className="font-medium text-gray-700">Password</Label>
+            <Label className={labelClass}>পাসওয়ার্ড</Label>
             <Input
-              placeholder="Enter your password"
-              className="h-11 rounded-lg"
+              placeholder="কমপক্ষে ৮ অক্ষর"
+              className={inputClass}
               autoComplete="new-password"
             />
-            <Description className="text-xs text-gray-400">
-              Minimum 8 characters, 1 uppercase letter and 1 number.
+            <Description className="text-xs text-gray-500">
+              ৮+ অক্ষর, ১টি বড় হাতের অক্ষর ও ১টি সংখ্যা।
             </Description>
             <FieldError />
           </TextField>
 
-          {/* Buttons */}
-          <div className="mt-2 flex w-full gap-3">
-            <Button
-              type="submit"
-              className="h-11 flex-1 rounded-lg bg-indigo-600 font-semibold text-white hover:bg-indigo-700"
-            >
-              <Check />
-              Create Account
-            </Button>
+          <TextField
+            isRequired
+            name="confirmPassword"
+            type="password"
+            validate={(v) => (v === password ? null : "পাসওয়ার্ড মিলছে না")}
+          >
+            <Label className={labelClass}>পাসওয়ার্ড নিশ্চিত করুন</Label>
+            <Input
+              placeholder="আবার লিখুন"
+              className={inputClass}
+              autoComplete="new-password"
+            />
+            <FieldError />
+          </TextField>
 
-            <Button
-              type="reset"
-              variant="secondary"
-              className="h-11 rounded-lg px-6"
-            >
-              Reset
-            </Button>
-          </div>
+          <Button
+            type="submit"
+            isDisabled={loading}
+            className="h-11 w-full rounded-lg bg-green-700 font-semibold text-white shadow-md hover:bg-green-800"
+          >
+            {loading ? "অপেক্ষা করুন..." : "অ্যাকাউন্ট তৈরি করুন"}
+          </Button>
         </Form>
 
-        {/* Footer */}
-        <div className="mt-7 border-t border-gray-100 pt-5 text-center">
-          <p className="text-sm text-gray-500">
-            Already have an account?{" "}
-            <Link
-              href="/sign-in"
-              className="font-semibold text-indigo-600 hover:text-indigo-800"
-            >
-              Sign In
-            </Link>
-          </p>
+        {/* Divider */}
+        <div className="my-5 flex items-center gap-3">
+          <div className="h-px flex-1 bg-gray-200" />
+          <span className="text-xs text-gray-600">অথবা</span>
+          <div className="h-px flex-1 bg-gray-200" />
         </div>
+
+        {/* Social */}
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            type="button"
+            variant="secondary"
+            className="h-11 rounded-lg text-sm font-semibold"
+            onPress={() => socialSignIn("google")}
+          >
+            Google দিয়ে চালিয়ে যান
+          </Button>
+        </div>
+
+        <p className="mt-6 text-center text-sm text-gray-700">
+          অ্যাকাউন্ট আছে?{" "}
+          <Link
+            href="/sign-in"
+            className="font-medium text-green-700 hover:text-green-900"
+          >
+            সাইন ইন করুন
+          </Link>
+        </p>
       </div>
+
+      <Link href="/" className="mt-8 text-sm text-gray-500 hover:text-gray-700">
+        ← হোম পেজে ফিরে যান
+      </Link>
     </div>
   );
 }
