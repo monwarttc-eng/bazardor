@@ -8,11 +8,11 @@ import {
   Input,
   Label,
   TextField,
-  toast,
 } from "@heroui/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -37,8 +37,8 @@ export default function SignUpPage() {
       toast.danger(error.message || "অ্যাকাউন্ট তৈরি করা যায়নি");
       return;
     }
-
     toast.success("অ্যাকাউন্ট তৈরি হয়েছে");
+
     router.push("/sign-in");
   };
 

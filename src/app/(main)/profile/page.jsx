@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import ProfileForm from "./ProfileForm";
+import Image from "next/image";
 
 async function ProfileContent() {
   const session = await auth.api.getSession({
@@ -31,7 +32,7 @@ async function ProfileContent() {
         <div className="flex items-center gap-3 rounded-2xl border border-[#e0e8e0] bg-white/80 p-5">
           <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-gray-100">
             {user.image ? (
-              <img
+              <Image
                 src={user.image}
                 alt={user.name || "User"}
                 className="h-full w-full object-cover"

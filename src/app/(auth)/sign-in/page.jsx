@@ -7,11 +7,11 @@ import {
   Input,
   Label,
   TextField,
-  toast,
 } from "@heroui/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -34,6 +34,7 @@ export default function SignInPage() {
     }
 
     toast.success("সফলভাবে সাইন ইন হয়েছে");
+
     router.push("/");
   };
 
@@ -103,7 +104,7 @@ export default function SignInPage() {
           <span className="h-px flex-1 bg-gray-200" />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3">
           <Button
             type="button"
             variant="secondary"

@@ -1,16 +1,13 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Noto_Serif_Bengali } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import toast, { Toaster } from "react-hot-toast";
+import Marque from "./components/Marque";
+import { Suspense } from "react";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const notoSerifBengali = Noto_Serif_Bengali({
+  subsets: ["latin", "bengali"],
 });
 
 export const metadata = {
@@ -21,15 +18,17 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang="bn"
+      className={`${notoSerifBengali.className}  h-full antialiased`}
     >
       <body>
-        <div className="">
-          <Navbar></Navbar>
-
+        <div className="mx-width-[1200]">
+          <Suspense fallback={<div>Loading Navbar...</div>}>
+            <Navbar />
+          </Suspense>
+          <Marque></Marque>
           <main>{children}</main>
-
+          <Toaster />
           <Footer></Footer>
         </div>
       </body>
