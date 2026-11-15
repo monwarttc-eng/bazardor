@@ -104,7 +104,7 @@ export default function SignInPage() {
           <span className="h-px flex-1 bg-gray-200" />
         </div>
 
-        <div className="grid grid-cols-1 gap-3">
+        <div className="my-5 flex items-center gap-3">
           <Button
             type="button"
             variant="secondary"
