@@ -7,6 +7,12 @@ const client = new MongoClient(process.env.MONGODB_URI);
 const db = client.db("better-auth-db");
 
 export const auth = betterAuth({
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google"],
+    },
+  },
   database: mongodbAdapter(db, {
     client,
   }),
